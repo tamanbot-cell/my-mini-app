@@ -1,5 +1,5 @@
 const tg = window.Telegram.WebApp;
-const API_URL = "https://taman964-api-handler.hf.space"; 
+const API_URL = "https://taman964-api-handler.hf.space/send_code"; 
 
 tg.expand();
 
